@@ -5,6 +5,9 @@ import logger from "./utils/logger.js";
 import config from "./utils/config.js";
 import middleware from "./utils/middleware.js";
 
+// Router
+import usersRouter from "./controllers/user.controller.js";
+
 const app = express();
 
 const mongoUrl = config.MONGODB_URI;
@@ -26,11 +29,11 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
+app.use(middleware.requestLogger);
 
-app.use("/", async (req, res) => {
-  res.send("Hello, World");
-});
+app.use("/users", usersRouter);
 
+app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
 export default app;
