@@ -14,8 +14,7 @@ usersRouter.post(
     const body = req.body;
     const password = body.password;
 
-    let avatar =
-      "https://res.cloudinary.com/ddcjpdysf/image/upload/v1616557302/l8uj8fwjdimjymnjp5rq.png";
+    let avatar;
 
     if (req.file) {
       const result = await cloudinary.v2.uploader.upload(req.file.path);
