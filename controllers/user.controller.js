@@ -9,24 +9,16 @@ const usersRouter = express.Router();
 
 usersRouter.post(
   "/",
-  upload,
   catchAsync(async (req, res, next) => {
     const body = req.body;
     const password = body.password;
 
-    let avatar;
-
-    if (req.file) {
-      const result = await cloudinary.v2.uploader.upload(req.file.path);
-      avatar = result.secure_url;
-    }
-
     if (!password) {
       return res.status(400).send({ error: "password is required" });
-    } else if (password.length < 3) {
+    } else if (password.length < 6) {
       return res
         .status(400)
-        .send({ error: "password must be at least 3 characters long" });
+        .send({ error: "password must be at least 6 characters long" });
     }
 
     const saltRounds = 10;
@@ -34,15 +26,53 @@ usersRouter.post(
 
     const user = new User({
       email: body.email,
-      name: body.name,
-      bio: body.bio,
-      phone: body.phone,
-      avatar,
       passwordHash,
     });
 
     const savedUser = await user.save();
     res.json(savedUser);
+  })
+);
+
+usersRouter.put(
+  "/:id",
+  upload,
+  catchAsync(async (req, res, next) => {
+    const body = req.body;
+    const id = req.params.id;
+    const password = body.password;
+
+    const toUpdate = await User.findById(id);
+
+    let passwordHash = toUpdate.passwordHash;
+
+    if (password && password?.length > 6) {
+      const saltRounds = 10;
+      passwordHash = await bcrypt.hash(password, saltRounds);
+    } else if (password?.length < 6) {
+      return res
+        .status(400)
+        .send({ error: "password must be at least 6 characters long" });
+    }
+
+    let avatar = body.avatar;
+
+    if (req.file) {
+      const result = await cloudinary.v2.uploader.upload(req.file.path);
+      avatar = result.secure_url;
+    }
+
+    const user = {
+      email: body.email,
+      passwordHash,
+      name: body.name,
+      bio: body.bio,
+      phone: body.phone,
+      avatar,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(id, user, { new: true });
+    res.json(updatedUser);
   })
 );
 
