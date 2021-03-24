@@ -7,6 +7,7 @@ import middleware from "./utils/middleware.js";
 
 // Router
 import usersRouter from "./controllers/user.controller.js";
+import loginRouter from "./controllers/login.controller.js";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use(express.json());
 app.use(middleware.requestLogger);
 
 app.use("/users", usersRouter);
+app.use("/users", loginRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
