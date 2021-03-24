@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema({
   passwordHash: {
     type: String,
   },
+  avatar: {
+    type: String,
+  },
 });
 
 userSchema.set("toJSON", {
