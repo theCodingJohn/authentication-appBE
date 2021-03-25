@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import express from "express";
 import catchAsync from "../utils/catchAsync.js";
 import User from "../models/user.model.js";
@@ -6,6 +7,14 @@ import upload from "../utils/multer.js";
 import cloudinary from "../utils/cloudinary.js";
 
 const usersRouter = express.Router();
+
+const getTokenFrom = (request) => {
+  const authorization = request.get("authorization");
+  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
+    return authorization.substring(7);
+  }
+  return null;
+};
 
 usersRouter.post(
   "/",
@@ -38,6 +47,12 @@ usersRouter.put(
   "/:id",
   upload,
   catchAsync(async (req, res, next) => {
+    const token = getTokenFrom(req);
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    if (!token || !decodedToken.id) {
+      return res.status(401).json({ error: "token missing or invalid" });
+    }
+
     const body = req.body;
     const id = req.params.id;
     const password = body.password;
@@ -55,7 +70,7 @@ usersRouter.put(
         .send({ error: "password must be at least 6 characters long" });
     }
 
-    let avatar = body.avatar;
+    let avatar = toUpdate.avatar;
 
     if (req.file) {
       const result = await cloudinary.v2.uploader.upload(req.file.path);
