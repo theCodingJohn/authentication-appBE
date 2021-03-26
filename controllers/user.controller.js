@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import express from "express";
 import catchAsync from "../utils/catchAsync.js";
 import User from "../models/user.model.js";
@@ -8,51 +7,10 @@ import cloudinary from "../utils/cloudinary.js";
 
 const usersRouter = express.Router();
 
-const getTokenFrom = (request) => {
-  const authorization = request.get("authorization");
-  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
-    return authorization.substring(7);
-  }
-  return null;
-};
-
-usersRouter.post(
-  "/",
-  catchAsync(async (req, res, next) => {
-    const body = req.body;
-    const password = body.password;
-
-    if (!password) {
-      return res.status(400).send({ error: "password is required" });
-    } else if (password.length < 6) {
-      return res
-        .status(400)
-        .send({ error: "password must be at least 6 characters long" });
-    }
-
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
-
-    const user = new User({
-      email: body.email,
-      passwordHash,
-    });
-
-    const savedUser = await user.save();
-    res.json(savedUser);
-  })
-);
-
 usersRouter.put(
   "/:id",
   upload,
   catchAsync(async (req, res, next) => {
-    const token = getTokenFrom(req);
-    const decodedToken = jwt.verify(token, process.env.SECRET);
-    if (!token || !decodedToken.id) {
-      return res.status(401).json({ error: "token missing or invalid" });
-    }
-
     const body = req.body;
     const id = req.params.id;
     const password = body.password;
@@ -88,6 +46,15 @@ usersRouter.put(
 
     const updatedUser = await User.findByIdAndUpdate(id, user, { new: true });
     res.json(updatedUser);
+  })
+);
+
+usersRouter.get(
+  "/:id",
+  catchAsync(async (req, res, next) => {
+    const id = req.params.id;
+    const user = await User.findById(id);
+    res.json(user);
   })
 );
 

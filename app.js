@@ -8,6 +8,7 @@ import middleware from "./utils/middleware.js";
 // Router
 import usersRouter from "./controllers/user.controller.js";
 import loginRouter from "./controllers/login.controller.js";
+import registerRouter from "./controllers/register.controller.js";
 
 const app = express();
 
@@ -33,8 +34,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(middleware.requestLogger);
 
-app.use("/users", usersRouter);
+app.use("/users", registerRouter);
 app.use("/users", loginRouter);
+
+app.use(middleware.checkAuth);
+app.use("/users", usersRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
