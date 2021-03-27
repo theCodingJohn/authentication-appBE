@@ -18,7 +18,7 @@ loginRouter.post(
         : null;
 
     if (!(user && passwordCorrect)) {
-      return response.status(401).json({
+      return res.status(401).json({
         error: "invalid email or password",
       });
     }
