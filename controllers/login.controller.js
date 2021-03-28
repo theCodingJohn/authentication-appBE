@@ -17,9 +17,15 @@ loginRouter.post(
         ? await bcryt.compare(body.password, user.passwordHash)
         : null;
 
-    if (!(user && passwordCorrect)) {
+    if (!user) {
       return res.status(401).json({
-        error: "invalid email or password",
+        error: "invalid email",
+      });
+    }
+
+    if (!passwordCorrect) {
+      return res.status(401).json({
+        error: "invalid password",
       });
     }
 
