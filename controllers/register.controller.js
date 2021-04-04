@@ -12,11 +12,11 @@ registerRouter.post(
     const password = body.password;
 
     if (!password) {
-      return res.status(400).send({ error: "password is required" });
+      return res.status(400).send({ error: "Password is required" });
     } else if (password.length < 6) {
       return res
         .status(400)
-        .send({ error: "password must be at least 6 characters long" });
+        .send({ error: "Password must be at least 6 characters long" });
     }
 
     const saltRounds = 10;

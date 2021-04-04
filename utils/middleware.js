@@ -21,14 +21,14 @@ const checkAuth = (req, res, next) => {
   const token = getTokenFrom(req);
   const decodedToken = jwt.verify(token, process.env.SECRET);
   if (!token || !decodedToken.id) {
-    return res.status(401).json({ error: "token missing or invalid" });
+    return res.status(401).json({ error: "Token missing or invalid" });
   }
 
   next();
 };
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: "unknown endpoint" });
+  response.status(404).send({ error: "Unknown endpoint" });
 };
 
 const errorHandler = (error, req, res, next) => {
@@ -36,7 +36,7 @@ const errorHandler = (error, req, res, next) => {
   if (error.name === "ValidationError") {
     return res.status(400).json({ error: error.message });
   } else if (error.name === "JsonWebTokenError") {
-    return res.status(401).json({ error: "invalid token" });
+    return res.status(401).json({ error: "Invalid token" });
   }
   next(error);
 };

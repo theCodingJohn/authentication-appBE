@@ -19,13 +19,13 @@ loginRouter.post(
 
     if (!user) {
       return res.status(401).json({
-        error: "invalid email",
+        error: "Invalid email",
       });
     }
 
     if (!passwordCorrect) {
       return res.status(401).json({
-        error: "invalid password",
+        error: "Invalid password",
       });
     }
 
